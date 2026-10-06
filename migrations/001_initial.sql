@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS admins(id INTEGER PRIMARY KEY, username TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS candidates(id INTEGER PRIMARY KEY, name TEXT NOT NULL, number TEXT UNIQUE NOT NULL, photo TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS rounds(id INTEGER PRIMARY KEY, title TEXT NOT NULL, office TEXT NOT NULL, digits INTEGER NOT NULL CHECK(digits BETWEEN 1 AND 10), status TEXT NOT NULL DEFAULT 'draft', opened_at TEXT, closed_at TEXT);
+CREATE UNIQUE INDEX IF NOT EXISTS one_open ON rounds(status) WHERE status='open';
+CREATE TABLE IF NOT EXISTS round_candidates(id INTEGER PRIMARY KEY, round_id INTEGER NOT NULL REFERENCES rounds(id), source_id INTEGER NOT NULL, name TEXT NOT NULL, number TEXT NOT NULL, photo TEXT NOT NULL, UNIQUE(round_id,number));
+CREATE TABLE IF NOT EXISTS votes(id TEXT PRIMARY KEY, round_id INTEGER NOT NULL REFERENCES rounds(id), created_at TEXT NOT NULL, kind TEXT NOT NULL CHECK(kind IN ('valid','blank','null')), candidate_id INTEGER REFERENCES round_candidates(id), idempotency TEXT UNIQUE NOT NULL, payload TEXT NOT NULL);
